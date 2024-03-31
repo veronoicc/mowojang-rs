@@ -1,11 +1,6 @@
-#![feature(lazy_cell)]
-
-use std::sync::LazyLock;
 use uuid::Uuid;
 
 pub const MOWOJANG_API_URI: &str = "https://mowojang.matdoes.dev/";
-pub static INTERNAL_API_URI: LazyLock<Option<String>> =
-    LazyLock::new(|| config::get().mowojang.internal_api_uri.clone());
 
 #[derive(Debug, PartialEq, Clone, serde::Deserialize)]
 pub struct MowojangApiResponse {
@@ -41,11 +36,6 @@ pub async fn check_username(username: &str) -> Option<MowojangApiResponse> {
     if !valid_java_username(username) {
         return None;
     };
-    if let Some(url) = &*INTERNAL_API_URI {
-        if let Some(res) = api_internal(url, username).await {
-            return Some(res);
-        }
-    }
     api_internal(MOWOJANG_API_URI, username).await
 }
 
@@ -54,11 +44,6 @@ where
     Uuid: From<T>,
 {
     let uuid = Uuid::from(uuid);
-    if let Some(url) = &*INTERNAL_API_URI {
-        if let Some(res) = api_internal(url, uuid).await {
-            return Some(res);
-        }
-    }
     api_internal(MOWOJANG_API_URI, uuid).await
 }
 
